@@ -39,13 +39,34 @@ GROUP BY B.CODIGO_RED_SOCIAL, B.NOMBRE_RED_SOCIAL;
 --tarjetas a las que ha comentado (pista: una posible solución para este último campo es utilizar
 --count(distinct campo))
 
+SELECT CODIGO_USUARIO, COUNT(*) AS CANTIDAD_COMENTARIOS
+FROM TBL_COMENTARIOS
+GROUP BY CODIGO_USUARIO;
 
+WITH COMENTARIOS AS (
+    SELECT  A.NOMBRE || ' ' || A.APELLIDO AS NOMBRE_COMPLETO,
+            A.CORREO,
+            COUNT(B.CODIGO_COMENTARIO) AS CANTIDAD_COMENTARIOS,
+            COUNT(DISTINCT B.CODIGO_TARJETA) AS TARJETAS
+    FROM TBL_USUARIOS A
+    INNER JOIN TBL_COMENTARIOS B
+    ON A.CODIGO_USUARIO = B.CODIGO_USUARIO
+    GROUP BY A.NOMBRE || ' ' || A.APELLIDO, A.CORREO
+)
+SELECT *
+FROM COMENTARIOS
+WHERE CANTIDAD_COMENTARIOS = (SELECT MAX(CANTIDAD_COMENTARIOS) FROM COMENTARIOS);
+
+COMMIT;
 
 --4. Mostrar TODOS los usuarios con plan FREE, de dichos usuarios mostrar la siguiente información:
 --• Nombre completo
 --• Correo
 --• Red social (En caso de estar registrado con una)
 --• Cantidad de organizaciones que ha creado, mostrar 0 si no ha creado ninguna.
+
+
+
 --5. Mostrar los usuarios que han creado más de 5 tarjetas, para estos usuarios mostrar:
 --Nombre completo, correo, cantidad de tarjetas creadas
 --6. Un usuario puede estar suscrito a tableros, listas y tarjetas, de tal forma que si hay algún cambio
